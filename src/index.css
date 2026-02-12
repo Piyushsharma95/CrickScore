@@ -1,0 +1,307 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+@layer components {
+
+  /* Layout */
+  .app-container {
+    @apply max-w-[600px] mx-auto min-h-screen bg-white flex flex-col relative shadow-2xl;
+  }
+
+  @media (min-width: 1024px) {
+    .app-container {
+      @apply max-w-[500px] my-6 min-h-[calc(100vh-3rem)] rounded-2xl overflow-hidden;
+    }
+  }
+
+  .main-content {
+    @apply flex-1 p-5 overflow-y-auto;
+  }
+
+  /* Header */
+  .app-header {
+    @apply sticky top-0 z-50 px-6 py-5 flex items-center justify-between shadow-md text-white;
+    background: linear-gradient(135deg, #003399 0%, #001f5c 100%);
+  }
+
+  .header-title {
+    @apply text-base font-extrabold tracking-wider uppercase;
+  }
+
+  /* Cards */
+  .card-premium {
+    @apply bg-white border border-slate-200 rounded-xl p-5 mb-4 shadow-sm;
+  }
+
+  /* Buttons */
+  .btn-p {
+    @apply bg-p-blue text-white border-none px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-widest cursor-pointer transition-all shadow-lg;
+  }
+
+  .btn-p:hover {
+    @apply brightness-110 -translate-y-0.5;
+  }
+
+  .btn-p:active {
+    @apply translate-y-0;
+  }
+
+  .btn-p:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .btn-s {
+    @apply bg-white text-p-blue border-2 border-p-blue px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-widest cursor-pointer;
+  }
+
+  /* Forms */
+  .setup-group {
+    @apply mb-6;
+  }
+
+  .setup-label {
+    @apply block text-[0.65rem] font-extrabold text-p-blue mb-2 uppercase tracking-widest;
+  }
+
+  .setup-input-underlined {
+    @apply w-full border-none border-b-2 border-slate-200 pb-2 text-base font-bold text-slate-800 bg-transparent transition-colors;
+  }
+
+  .setup-input-underlined:focus {
+    @apply outline-none border-p-blue;
+  }
+
+  /* Control Panel */
+  .control-panel {
+    @apply bg-white border-t-2 border-slate-100 p-5 shadow-2xl;
+  }
+
+  .extra-chip-btn {
+    @apply px-4 py-2 border-2 border-slate-200 rounded-full text-xs font-bold text-slate-600 bg-white cursor-pointer text-center transition-all;
+  }
+
+  .extra-chip-btn.active {
+    @apply bg-saffron border-saffron text-white shadow-lg;
+  }
+
+  .extra-chip-btn:hover:not(.active) {
+    @apply bg-p-blue-bg border-p-blue;
+  }
+
+  .wicket-btn {
+    @apply bg-red-50 text-red-600 border-red-100 font-black;
+  }
+
+  .wicket-btn.active {
+    @apply bg-red-600 border-red-600 text-white shadow-xl shadow-red-200;
+  }
+
+  .run-circle {
+    @apply aspect-square rounded-full border-2 border-p-blue bg-white text-p-blue text-xl font-extrabold flex items-center justify-center cursor-pointer transition-all;
+  }
+
+  .run-circle:hover {
+    @apply bg-p-blue-bg -translate-y-0.5;
+  }
+
+  .run-circle:active {
+    @apply bg-p-blue text-white scale-90;
+  }
+
+  .ball-dot {
+    @apply w-9 h-9 rounded-full flex items-center justify-center text-sm font-extrabold bg-slate-100 text-slate-600 border border-slate-200;
+  }
+
+  .ball-dot.wkt {
+    @apply bg-red-50 text-red-600 border-red-200;
+  }
+
+  /* Score Display */
+  .score-card {
+    @apply p-6 rounded-xl border border-p-blue-bg mb-5 shadow-sm;
+    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+  }
+
+  .score-text {
+    @apply text-5xl font-black text-p-blue tracking-tight leading-none;
+  }
+
+  /* Tables */
+  .modern-table {
+    @apply w-full border-collapse;
+  }
+
+  .modern-table th {
+    @apply px-4 py-3 text-left text-[0.65rem] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50 border-b border-slate-200;
+  }
+
+  .modern-table td {
+    @apply px-4 py-3 text-sm border-b border-slate-50;
+  }
+
+  .player-name-link {
+    @apply text-p-blue-light font-bold cursor-pointer;
+  }
+
+  .stat-val {
+    @apply text-right text-slate-600;
+  }
+
+  .stat-val-bold {
+    @apply text-right font-extrabold text-slate-800;
+  }
+
+  .how-out-text {
+    @apply text-[0.7rem] text-slate-400 italic;
+  }
+
+  /* Match Summary */
+  .match-card {
+    @apply mx-4 my-4 bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm;
+  }
+
+  .match-card-header {
+    @apply px-4 py-3 bg-p-blue text-white flex justify-between items-center;
+  }
+
+  .team-name-lg {
+    @apply font-extrabold text-sm uppercase tracking-tight;
+  }
+
+  .total-score-lg {
+    @apply font-black text-lg;
+  }
+
+  .summary-row {
+    @apply flex justify-between px-4 py-3 text-sm border-t border-slate-100;
+  }
+
+  .summary-row-label {
+    @apply font-bold text-slate-400 uppercase tracking-widest text-[0.6rem];
+  }
+
+  .total-summary-row {
+    @apply bg-p-blue-bg text-p-blue px-4 py-3 flex justify-between items-center;
+  }
+
+  .result-hero-p {
+    @apply px-6 py-12 text-center text-white rounded-b-[40px] shadow-lg relative;
+    background: linear-gradient(to bottom, #003399 0%, #001f5c 100%);
+  }
+
+  .result-hero-p::before {
+    content: '';
+    @apply absolute top-0 left-0 right-0 h-1 opacity-80;
+    background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
+  }
+
+  .mom-card-premium {
+    @apply mx-4 my-4 p-5 rounded-2xl text-white flex items-center gap-4 relative overflow-hidden;
+    background: linear-gradient(135deg, #001a4d 0%, #000d26 100%);
+  }
+
+  .mom-icon-box {
+    @apply w-14 h-14 flex items-center justify-center rounded-xl;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .label-mom {
+    @apply text-saffron font-black text-[0.7rem] uppercase tracking-[0.2em];
+  }
+
+  .mom-name {
+    @apply text-2xl font-black tracking-tight;
+  }
+
+  .mom-desc {
+    @apply text-sm text-slate-400;
+  }
+
+  /* Navigation */
+  .bottom-nav {
+    @apply bg-white border-t border-slate-200 px-4 py-3 flex justify-around sticky bottom-0 z-50;
+  }
+
+  .nav-item {
+    @apply flex flex-col items-center gap-1 text-[0.7rem] font-bold text-slate-400 cursor-pointer;
+  }
+
+  .nav-item.active {
+    @apply text-p-blue;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    @apply fixed inset-0 flex items-center justify-center z-[2000] p-4;
+    background: rgba(0, 20, 60, 0.4);
+    backdrop-filter: blur(8px);
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-fade {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.modal-overlay .app-container {
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
