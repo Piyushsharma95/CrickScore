@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Settings, Bell, Trophy, Swords, Calendar, Clock, MapPin } from 'lucide-react';
 
+import { createLiveMatch } from '../supabase';
+
 interface MatchSetupProps {
-    onStart: (teamA: string, teamB: string, overs: number, battingFirst: 'TeamA' | 'TeamB') => void;
+    onStart: (teamA: string, teamB: string, overs: number, battingFirst: 'TeamA' | 'TeamB', isLive?: boolean, matchId?: string) => void;
 }
 
 export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
@@ -11,11 +13,14 @@ export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
     const [overs, setOvers] = useState(16);
     const [tossWinner, setTossWinner] = useState<'TeamA' | 'TeamB'>('TeamA');
     const [choice, setChoice] = useState<'Bat' | 'Bowl'>('Bat');
+    const [isLive, setIsLive] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
 
-    const handleStart = (e: React.FormEvent) => {
+    const handleStart = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!teamA || !teamB) return;
 
+        setIsCreating(true);
         let battingFirst: 'TeamA' | 'TeamB';
         if (tossWinner === 'TeamA') {
             battingFirst = choice === 'Bat' ? 'TeamA' : 'TeamB';
@@ -23,7 +28,14 @@ export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
             battingFirst = choice === 'Bat' ? 'TeamB' : 'TeamA';
         }
 
-        onStart(teamA, teamB, overs, battingFirst);
+        let matchId: string | undefined;
+        if (isLive) {
+            const id = await createLiveMatch(teamA, teamB, overs);
+            if (id) matchId = id;
+        }
+
+        onStart(teamA, teamB, overs, battingFirst, isLive, matchId);
+        setIsCreating(false);
     };
 
     return (
@@ -142,12 +154,27 @@ export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
                         </div>
                     </div>
 
-                    <div className="mt-8 mb-4">
-                        <button type="submit" className="btn-p w-full !py-4 shadow-xl text-md">
-                            START MATCH
-                        </button>
+                    <div className="card-premium mt-4">
+                        <div className="setup-group !mb-0 flex items-center justify-between">
+                            <div>
+                                <label className="setup-label !mb-1">Live Match</label>
+                                <p className="text-xs text-slate-400">Broadcast scores in real-time</p>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setIsLive(!isLive)}
+                                className={`w-12 h-6 rounded-full transition-colors relative ${isLive ? 'bg-p-blue' : 'bg-slate-200'}`}
+                            >
+                                <div className={`w-4 h-4 bg-white rounded-full absolute top-1 transition-all ${isLive ? 'left-7' : 'left-1'}`} />
+                            </button>
+                        </div>
                     </div>
-                </form>
+
+                    <div className="mt-8 mb-4">
+                        <button type="submit" disabled={isCreating} className="btn-p w-full !py-4 shadow-xl text-md flex justify-center items-center gap-2">
+                            {isCreating ? 'CREATING...' : 'START MATCH'}
+                        </button>
+                    </div>                </form>
             </main>
 
             <nav className="bottom-nav">
