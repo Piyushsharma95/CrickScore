@@ -104,8 +104,14 @@ function App() {
           <span className="header-title uppercase tracking-widest">{matchState.battingTeam} v/s {matchState.bowlingTeam}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-saffron rounded-full animate-pulse"></div>
-          <span className="text-[0.6rem] font-black text-white uppercase tracking-widest">Live Match</span>
+          {matchState.isLive ? (
+            <>
+              <div className="w-2 h-2 bg-saffron rounded-full animate-pulse"></div>
+              <span className="text-[0.6rem] font-black text-white uppercase tracking-widest">Live Broadcast</span>
+            </>
+          ) : (
+            <span className="text-[0.6rem] font-black text-white/50 uppercase tracking-widest">Local Match</span>
+          )}
         </div>
       </header>
 

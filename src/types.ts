@@ -99,4 +99,7 @@ export interface MatchState {
     manOfTheMatch?: Player & { reason: string };
     pastStates?: any[];
     lastBowlerId: string | null;
+    matchId?: string;
+    isLive?: boolean;
+    isSavedToSupabase?: boolean;
 }

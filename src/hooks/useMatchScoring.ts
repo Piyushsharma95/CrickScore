@@ -1,5 +1,6 @@
 import { useReducer, useEffect } from 'react';
 import type { MatchState, Bowler, Batsman, MatchStatus, ExtraType, WicketType } from '../types';
+import { updateMatch, saveMatch } from '../supabase';
 
 const INITIAL_STATE: MatchState = {
     status: 'SETUP',
@@ -32,11 +33,13 @@ const INITIAL_STATE: MatchState = {
     isBatterSelectionOpen: false,
     isFreeHit: false,
     pastStates: [],
-    lastBowlerId: null
+    lastBowlerId: null,
+    isLive: false,
+    matchId: undefined
 };
 
 type Action =
-    | { type: 'START_MATCH'; payload: { teamA: string; teamB: string; overs: number; battingFirst: 'TeamA' | 'TeamB' } }
+    | { type: 'START_MATCH'; payload: { teamA: string; teamB: string; overs: number; battingFirst: 'TeamA' | 'TeamB'; isLive: boolean; matchId?: string } }
     | { type: 'SET_OPENING_PLAYERS'; payload: { striker: string; nonStriker: string; bowler: string } }
     | { type: 'BOWL_BALL'; payload: { runs: number; extraType: ExtraType; wicketType: WicketType } }
     | { type: 'SELECT_NEXT_BOWLER'; payload: { bowlerName: string; isNew: boolean; existingId?: string } }
@@ -44,8 +47,10 @@ type Action =
     | { type: 'NEXT_INNINGS' }
     | { type: 'RESTART' }
     | { type: 'UNDO' }
+    | { type: 'UNDO' }
     | { type: 'UPDATE_BATSMAN_NAME'; payload: { id: string; name: string } }
-    | { type: 'UPDATE_BOWLER_NAME'; payload: { name: string } };
+    | { type: 'UPDATE_BOWLER_NAME'; payload: { name: string } }
+    | { type: 'MATCH_SAVED' };
 
 function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: string, name: string, reason: string } {
     let bestPlayer: any = null;
@@ -107,7 +112,7 @@ function matchReducer(state: MatchState, action: Action): MatchState {
 
     switch (action.type) {
         case 'START_MATCH': {
-            const { teamA, teamB, overs, battingFirst } = action.payload;
+            const { teamA, teamB, overs, battingFirst, isLive, matchId } = action.payload;
             return {
                 ...INITIAL_STATE,
                 status: 'SETUP',
@@ -120,6 +125,8 @@ function matchReducer(state: MatchState, action: Action): MatchState {
                 battingTeam: battingFirst === 'TeamA' ? teamA : teamB,
                 bowlingTeam: battingFirst === 'TeamA' ? teamB : teamA,
                 isBatterSelectionOpen: true,
+                isLive: isLive || false,
+                matchId: matchId
             };
         }
         case 'RESTART':
@@ -413,6 +420,9 @@ function matchReducer(state: MatchState, action: Action): MatchState {
             };
             return saveHistory(newState);
         }
+        case 'MATCH_SAVED':
+            const newState = { ...state, isSavedToSupabase: true };
+            return saveHistory(newState);
         default:
             return state;
     }
@@ -426,11 +436,28 @@ export function useMatchScoring() {
 
     useEffect(() => {
         localStorage.setItem('cricket_match_state', JSON.stringify(matchState));
+
+        if (matchState.isLive && matchState.matchId) {
+            // Debounce or just fire? For a scoring app, immediate is usually fine, 
+            // but maybe check for status changes to avoid too many writes if not needed.
+            // We'll update on every state change for now to be "Real Time"
+            updateMatch(matchState.matchId, matchState);
+        }
+
+        if (matchState.status === 'COMPLETED' && !matchState.isLive && !matchState.isSavedToSupabase) {
+            // For non-live matches, we might want to prompt user or auto-save.
+            // Currently manual save is not exposed in UI, so let's auto-save to history
+            saveMatch(matchState).then((res) => {
+                if (res && !res.error) {
+                    dispatch({ type: 'MATCH_SAVED' });
+                }
+            });
+        }
     }, [matchState]);
 
     return {
         matchState,
-        startMatch: (teamA: string, teamB: string, overs: number, battingFirst: 'TeamA' | 'TeamB') => dispatch({ type: 'START_MATCH', payload: { teamA, teamB, overs, battingFirst } }),
+        startMatch: (teamA: string, teamB: string, overs: number, battingFirst: 'TeamA' | 'TeamB', isLive: boolean = false, matchId?: string) => dispatch({ type: 'START_MATCH', payload: { teamA, teamB, overs, battingFirst, isLive, matchId } }),
         setOpeningPlayers: (striker: string, nonStriker: string, bowler: string) => dispatch({ type: 'SET_OPENING_PLAYERS', payload: { striker, nonStriker, bowler } }),
         bowlBall: (runs: number, extraType: ExtraType, wicketType: WicketType) => dispatch({ type: 'BOWL_BALL', payload: { runs, extraType, wicketType } }),
         selectNextBowler: (name: string, isNew: boolean, id?: string) => dispatch({ type: 'SELECT_NEXT_BOWLER', payload: { bowlerName: name, isNew, existingId: id } }),
