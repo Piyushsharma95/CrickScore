@@ -45,40 +45,92 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
         return "Match Tied";
     };
 
-    const downloadPDF = async () => {
-        if (!summaryRef.current) return;
+    const generatePDF = async () => {
+        if (!summaryRef.current) return null;
 
-        const canvas = await html2canvas(summaryRef.current, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            windowWidth: 800 // Consistent width for PDF layout
-        });
-
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-
-        const imgHeight = (canvasHeight * pdfWidth) / canvasWidth;
-        let heightLeft = imgHeight;
-        let position = 0;
-
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-        heightLeft -= pdfHeight;
-
-        while (heightLeft >= 0) {
-            position = heightLeft - imgHeight;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
+        // Temporarily adjust for PDF capture
+        const originalPadding = summaryRef.current.querySelector('.main-p-container')?.getAttribute('style') || '';
+        const paddingElement = summaryRef.current.querySelector('.main-p-container') as HTMLElement;
+        if (paddingElement) {
+            paddingElement.style.paddingBottom = '20px';
         }
 
-        pdf.save(`piyush_cricket_${teamA}_vs_${teamB}.pdf`);
+        try {
+            const canvas = await html2canvas(summaryRef.current, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                windowWidth: 800
+            });
+
+            // Restore padding
+            if (paddingElement) {
+                paddingElement.style.paddingBottom = '';
+            }
+
+            const imgData = canvas.toDataURL('image/png', 1.0);
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+
+            const canvasWidth = canvas.width;
+            const canvasHeight = canvas.height;
+            const imgHeight = (canvasHeight * pdfWidth) / canvasWidth;
+
+            let heightLeft = imgHeight;
+            let position = 0;
+
+            // Page 1
+            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+            heightLeft -= pdfHeight;
+
+            // Extra pages if needed
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
+                heightLeft -= pdfHeight;
+            }
+
+            return pdf;
+        } catch (error) {
+            console.error('PDF Generation Error:', error);
+            if (paddingElement) paddingElement.style.paddingBottom = '';
+            return null;
+        }
+    };
+
+    const downloadPDF = async () => {
+        const pdf = await generatePDF();
+        if (pdf) {
+            pdf.save(`piyush_cricket_${teamA}_vs_${teamB}.pdf`);
+        }
+    };
+
+    const shareMatch = async () => {
+        try {
+            const pdf = await generatePDF();
+            if (!pdf) return;
+
+            const pdfBlob = pdf.output('blob');
+            const file = new File([pdfBlob], `match_report_${teamA}_vs_${teamB}.pdf`, { type: 'application/pdf' });
+
+            if (navigator.share && navigator.canShare({ files: [file] })) {
+                await navigator.share({
+                    title: 'Cricket Match Report',
+                    text: `Check out the match report: ${teamA} vs ${teamB}`,
+                    files: [file],
+                });
+            } else {
+                // Fallback to download if sharing not supported
+                pdf.save(`piyush_cricket_${teamA}_vs_${teamB}.pdf`);
+            }
+        } catch (error) {
+            console.error('Error sharing:', error);
+            // Final fallback
+            downloadPDF();
+        }
     };
 
     const formatExtraString = (ex: any) => {
@@ -206,7 +258,7 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
                     <span className="header-title !text-white !uppercase tracking-widest">Match Report</span>
                 </div>
                 <div className="flex gap-4">
-                    <Share2 className="w-5 h-5 cursor-pointer text-white/80 hover:text-white" />
+                    <Share2 className="w-5 h-5 cursor-pointer text-white/80 hover:text-white" onClick={shareMatch} />
                     <Download className="w-5 h-5 cursor-pointer text-white/80 hover:text-white" onClick={downloadPDF} />
                 </div>
             </header>
@@ -240,7 +292,7 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
                     </div>
                 </div>
 
-                <div className="p-4 sm:p-6 pb-24">
+                <div className="p-4 sm:p-6 pb-24 main-p-container">
                     {manOfTheMatch && (
                         <div className="mom-card-premium !mb-10 p-6 !rounded-3xl flex items-center gap-8 text-white relative overflow-hidden">
                             <div className="absolute -right-6 -bottom-6 opacity-10 rotate-12">
@@ -306,11 +358,11 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
 
             <div className="p-6 bg-white border-t border-slate-100 sticky bottom-0 flex gap-4 backdrop-blur-md bg-white/90 z-[200]">
                 <button
-                    onClick={downloadPDF}
+                    onClick={shareMatch}
                     className="flex-1 flex items-center justify-center gap-3 font-black py-4 px-6 rounded-2xl border-2 border-p-blue text-p-blue hover:bg-p-blue-bg active:scale-95 transition-all text-[0.7rem] uppercase tracking-widest"
                 >
-                    <Download className="w-5 h-5" />
-                    SHARE PDF
+                    <Share2 className="w-5 h-5" />
+                    SHARE REPORT
                 </button>
                 <button
                     onClick={onRestart}
