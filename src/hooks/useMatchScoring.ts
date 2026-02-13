@@ -54,7 +54,7 @@ function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: st
     let maxPoints = -1;
     let reason = '';
 
-    batsmen.forEach(p => {
+    for (const p of batsmen) {
         // Runs are base points
         let pts = p.runs;
         // Boundaries are bonus
@@ -75,9 +75,9 @@ function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: st
             bestPlayer = p;
             reason = `${p.runs} Runs (${p.ballsFaced} balls)`;
         }
-    });
+    }
 
-    bowlers.forEach(p => {
+    for (const p of bowlers) {
         // Wickets are worth 25 runs equivalent
         let pts = p.wickets * 25;
         // Milestones
@@ -95,7 +95,7 @@ function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: st
             bestPlayer = p;
             reason = `${p.wickets} Wickets (${p.runsConceded} runs)`;
         }
-    });
+    }
 
     return bestPlayer ? { id: bestPlayer.id, name: bestPlayer.name, reason } : { id: '0', name: 'N/A', reason: 'N/A' };
 }

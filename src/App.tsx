@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useMatchScoring } from './hooks/useMatchScoring';
 import { ScoreHeader } from './components/ScoreHeader';
 import { BatsmanCard } from './components/BatsmanCard';
@@ -10,7 +10,7 @@ import { BowlerSelectionModal } from './components/BowlerSelectionModal';
 import { BatsmanSelectionModal } from './components/BatsmanSelectionModal';
 import { MatchSummary } from './components/MatchSummary';
 import { FullScorecardModal } from './components/FullScorecardModal';
-import { ArrowLeft, TrendingUp, Zap, FileText } from 'lucide-react';
+import { ArrowLeft, TrendingUp, FileText } from 'lucide-react';
 import type { ExtraType, WicketType, Batsman } from './types';
 
 function App() {
