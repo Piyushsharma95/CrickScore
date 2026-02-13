@@ -1,7 +1,6 @@
 import React, { useRef } from 'react';
 import { ArrowLeft, Share2, Download, Trophy, Target, Clock, Star, Users, ChevronRight } from 'lucide-react';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import type { Batsman, Bowler, FOW } from '../types';
 
 interface MatchSummaryProps {
@@ -46,59 +45,135 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
     };
 
     const generatePDF = async () => {
-        if (!summaryRef.current) return null;
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        let y = 15;
 
-        // Temporarily adjust for PDF capture
-        const originalPadding = summaryRef.current.querySelector('.main-p-container')?.getAttribute('style') || '';
-        const paddingElement = summaryRef.current.querySelector('.main-p-container') as HTMLElement;
-        if (paddingElement) {
-            paddingElement.style.paddingBottom = '20px';
+        // Helper for centered text
+        const centerText = (text: string, size: number, style: string = 'normal', color: [number, number, number] = [0, 51, 153]) => {
+            pdf.setFontSize(size);
+            pdf.setFont('helvetica', style);
+            pdf.setTextColor(color[0], color[1], color[2]);
+            const textWidth = pdf.getTextWidth(text);
+            pdf.text(text, (pageWidth - textWidth) / 2, y);
+            y += size / 2 + 2;
+        };
+
+        // Title
+        centerText('PIYUSH CRICKET', 20, 'bold');
+        centerText('OFFICIAL MATCH REPORT', 8, 'bold', [100, 100, 100]);
+        y += 5;
+
+        // Result Hero
+        centerText(getWinnerMessage(), 16, 'bold', [0, 0, 0]);
+        y += 5;
+
+        // Match Stats
+        pdf.setFontSize(10);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(`Target: ${target}`, 20, y);
+        pdf.text(`Duration: ${(oversA + oversB).toFixed(1)} Overs`, pageWidth - 60, y);
+        y += 10;
+
+        // Man of the Match
+        if (manOfTheMatch) {
+            pdf.setFillColor(240, 244, 255);
+            pdf.rect(15, y, pageWidth - 30, 20, 'F');
+            pdf.setTextColor(0, 51, 153);
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('MAN OF THE MATCH', 20, y + 7);
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(12);
+            pdf.text(`${manOfTheMatch.name} (${manOfTheMatch.reason})`, 20, y + 15);
+            y += 25;
         }
 
-        try {
-            const canvas = await html2canvas(summaryRef.current, {
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff',
-                windowWidth: 800
+        const addInningsTable = (teamName: string, runs: number, wickets: number, overs: number, batsmen: Batsman[], bowlers: Bowler[], extras: any) => {
+            // Innings Header
+            pdf.setFillColor(0, 51, 153);
+            pdf.rect(15, y, pageWidth - 30, 8, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(10);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${teamName}: ${runs}/${wickets} (${overs} Ov)`, 20, y + 5.5);
+            y += 10;
+
+            // Batsmen Table Header
+            pdf.setFillColor(245, 245, 245);
+            pdf.rect(15, y, pageWidth - 30, 6, 'F');
+            pdf.setTextColor(100, 100, 100);
+            pdf.setFontSize(8);
+            pdf.text('Batter', 20, y + 4.5);
+            pdf.text('R', 100, y + 4.5);
+            pdf.text('B', 120, y + 4.5);
+            pdf.text('4s', 140, y + 4.5);
+            pdf.text('6s', 160, y + 4.5);
+            pdf.text('SR', 180, y + 4.5);
+            y += 6;
+
+            // Batsmen Rows
+            pdf.setTextColor(0, 0, 0);
+            const played = batsmen.filter(b => b.ballsFaced > 0 || b.isOut);
+            played.forEach(b => {
+                if (y > 270) { pdf.addPage(); y = 15; }
+                pdf.setFont('helvetica', 'bold');
+                pdf.text(b.name, 20, y + 4);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(7);
+                pdf.text(b.out || (b.isOut ? 'out' : 'not out'), 20, y + 7);
+                pdf.setFontSize(8);
+                pdf.text(b.runs.toString(), 100, y + 4);
+                pdf.text(b.ballsFaced.toString(), 120, y + 4);
+                pdf.text(b.fours.toString(), 140, y + 4);
+                pdf.text(b.sixes.toString(), 160, y + 4);
+                const sr = b.ballsFaced > 0 ? (b.runs / b.ballsFaced * 100).toFixed(1) : '0.0';
+                pdf.text(sr, 180, y + 4);
+                y += 9;
             });
 
-            // Restore padding
-            if (paddingElement) {
-                paddingElement.style.paddingBottom = '';
-            }
+            // Extras
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`Extras: ${formatExtraString(extras)}`, 20, y + 4);
+            y += 8;
 
-            const imgData = canvas.toDataURL('image/png', 1.0);
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            const pdfWidth = pdf.internal.pageSize.getWidth();
-            const pdfHeight = pdf.internal.pageSize.getHeight();
+            // Bowlers Table
+            pdf.setFillColor(245, 245, 245);
+            pdf.rect(15, y, pageWidth - 30, 6, 'F');
+            pdf.setTextColor(100, 100, 100);
+            pdf.text('Bowler', 20, y + 4.5);
+            pdf.text('O', 100, y + 4.5);
+            pdf.text('M', 120, y + 4.5);
+            pdf.text('R', 140, y + 4.5);
+            pdf.text('W', 160, y + 4.5);
+            pdf.text('ECO', 180, y + 4.5);
+            y += 6;
 
-            const canvasWidth = canvas.width;
-            const canvasHeight = canvas.height;
-            const imgHeight = (canvasHeight * pdfWidth) / canvasWidth;
+            pdf.setTextColor(0, 0, 0);
+            bowlers.forEach(bw => {
+                pdf.text(bw.name, 20, y + 4);
+                pdf.text(bw.overs.toString(), 100, y + 4);
+                pdf.text((bw.maidens || 0).toString(), 120, y + 4);
+                pdf.text(bw.runsConceded.toString(), 140, y + 4);
+                pdf.text(bw.wickets.toString(), 160, y + 4);
+                const eco = bw.overs > 0 ? (bw.runsConceded / bw.overs).toFixed(2) : '0.00';
+                pdf.text(eco, 180, y + 4);
+                y += 6;
+            });
+            y += 5;
+        };
 
-            let heightLeft = imgHeight;
-            let position = 0;
+        addInningsTable(teamA, runsA, wicketsA, oversA, firstInningsBatsmen, firstInningsBowlers, firstInningsExtras);
+        y += 5;
+        addInningsTable(teamB, runsB, wicketsB, oversB, secondInningsBatsmen, secondInningsBowlers, secondInningsExtras);
 
-            // Page 1
-            pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-            heightLeft -= pdfHeight;
+        // Footer
+        y = 285;
+        pdf.setFontSize(7);
+        pdf.setTextColor(150, 150, 150);
+        centerText(`© ${new Date().getFullYear()} PIYUSH CRICKET - Elite Match Analytics`, 7, 'normal', [150, 150, 150]);
 
-            // Extra pages if needed
-            while (heightLeft > 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-                heightLeft -= pdfHeight;
-            }
-
-            return pdf;
-        } catch (error) {
-            console.error('PDF Generation Error:', error);
-            if (paddingElement) paddingElement.style.paddingBottom = '';
-            return null;
-        }
+        return pdf;
     };
 
     const downloadPDF = async () => {
