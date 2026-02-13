@@ -47,131 +47,149 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
     const generatePDF = async () => {
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pageWidth = pdf.internal.pageSize.getWidth();
-        let y = 15;
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        let y = 12;
 
-        // Helper for centered text
         const centerText = (text: string, size: number, style: string = 'normal', color: [number, number, number] = [0, 51, 153]) => {
             pdf.setFontSize(size);
             pdf.setFont('helvetica', style);
             pdf.setTextColor(color[0], color[1], color[2]);
             const textWidth = pdf.getTextWidth(text);
             pdf.text(text, (pageWidth - textWidth) / 2, y);
-            y += size / 2 + 2;
+            y += size / 2 + 1;
         };
 
-        // Title
-        centerText('PIYUSH CRICKET', 20, 'bold');
-        centerText('OFFICIAL MATCH REPORT', 8, 'bold', [100, 100, 100]);
+        // Header Section (More compact)
+        pdf.setFillColor(0, 51, 153);
+        pdf.rect(0, 0, pageWidth, 40, 'F');
+        y = 15;
+        centerText('PIYUSH CRICKET', 18, 'bold', [255, 255, 255]);
+        centerText('OFFICIAL DIGITAL MATCH SCORECARD', 7, 'bold', [200, 210, 255]);
+        y += 4;
+        centerText(getWinnerMessage(), 14, 'bold', [255, 255, 255]);
+
+        y = 45;
+        // Match Context
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`MATCH SUMMARY`, 15, y);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Target: ${target} Runs`, pageWidth - 45, y);
         y += 5;
+        pdf.setDrawColor(230, 230, 230);
+        pdf.line(15, y, pageWidth - 15, y);
+        y += 8;
 
-        // Result Hero
-        centerText(getWinnerMessage(), 16, 'bold', [0, 0, 0]);
-        y += 5;
-
-        // Match Stats
-        pdf.setFontSize(10);
-        pdf.setTextColor(0, 0, 0);
-        pdf.text(`Target: ${target}`, 20, y);
-        pdf.text(`Duration: ${(oversA + oversB).toFixed(1)} Overs`, pageWidth - 60, y);
-        y += 10;
-
-        // Man of the Match
+        // Man of the Match (Compact)
         if (manOfTheMatch) {
-            pdf.setFillColor(240, 244, 255);
-            pdf.rect(15, y, pageWidth - 30, 20, 'F');
+            pdf.setFillColor(245, 248, 255);
+            pdf.roundedRect(15, y, pageWidth - 30, 12, 2, 2, 'F');
             pdf.setTextColor(0, 51, 153);
-            pdf.setFontSize(10);
+            pdf.setFontSize(8);
             pdf.setFont('helvetica', 'bold');
-            pdf.text('MAN OF THE MATCH', 20, y + 7);
+            pdf.text('PLAYER OF THE MATCH:', 20, y + 7.5);
             pdf.setTextColor(0, 0, 0);
-            pdf.setFontSize(12);
-            pdf.text(`${manOfTheMatch.name} (${manOfTheMatch.reason})`, 20, y + 15);
-            y += 25;
+            pdf.setFontSize(10);
+            pdf.text(`${manOfTheMatch.name} (${manOfTheMatch.reason})`, 60, y + 7.5);
+            y += 18;
         }
 
         const addInningsTable = (teamName: string, runs: number, wickets: number, overs: number, batsmen: Batsman[], bowlers: Bowler[], extras: any) => {
             // Innings Header
             pdf.setFillColor(0, 51, 153);
-            pdf.rect(15, y, pageWidth - 30, 8, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFontSize(10);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text(`${teamName}: ${runs}/${wickets} (${overs} Ov)`, 20, y + 5.5);
-            y += 10;
-
-            // Batsmen Table Header
-            pdf.setFillColor(245, 245, 245);
             pdf.rect(15, y, pageWidth - 30, 6, 'F');
-            pdf.setTextColor(100, 100, 100);
-            pdf.setFontSize(8);
-            pdf.text('Batter', 20, y + 4.5);
-            pdf.text('R', 100, y + 4.5);
-            pdf.text('B', 120, y + 4.5);
-            pdf.text('4s', 140, y + 4.5);
-            pdf.text('6s', 160, y + 4.5);
-            pdf.text('SR', 180, y + 4.5);
-            y += 6;
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFontSize(9);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text(`${teamName.toUpperCase()}: ${runs}/${wickets} (${overs} Overs)`, 18, y + 4.5);
+            y += 8;
+
+            // Table Headers
+            pdf.setFillColor(245, 245, 245);
+            pdf.rect(15, y, pageWidth - 30, 5, 'F');
+            pdf.setTextColor(80, 80, 80);
+            pdf.setFontSize(7);
+            pdf.text('BATSMAN', 18, y + 3.5);
+            pdf.text('R', 105, y + 3.5);
+            pdf.text('B', 120, y + 3.5);
+            pdf.text('4s', 135, y + 3.5);
+            pdf.text('6s', 150, y + 3.5);
+            pdf.text('SR', 165, y + 3.5);
+            y += 5;
 
             // Batsmen Rows
             pdf.setTextColor(0, 0, 0);
             const played = batsmen.filter(b => b.ballsFaced > 0 || b.isOut);
             played.forEach(b => {
-                if (y > 270) { pdf.addPage(); y = 15; }
                 pdf.setFont('helvetica', 'bold');
-                pdf.text(b.name, 20, y + 4);
-                pdf.setFont('helvetica', 'normal');
-                pdf.setFontSize(7);
-                pdf.text(b.out || (b.isOut ? 'out' : 'not out'), 20, y + 7);
                 pdf.setFontSize(8);
-                pdf.text(b.runs.toString(), 100, y + 4);
+                pdf.text(b.name, 18, y + 4);
+                pdf.setFont('helvetica', 'normal');
+                pdf.setFontSize(6);
+                pdf.setTextColor(120, 120, 120);
+                pdf.text(b.out || (b.isOut ? 'out' : 'not out'), 18, y + 7);
+                pdf.setTextColor(0, 0, 0);
+                pdf.setFontSize(8);
+                pdf.text(b.runs.toString(), 105, y + 4);
                 pdf.text(b.ballsFaced.toString(), 120, y + 4);
-                pdf.text(b.fours.toString(), 140, y + 4);
-                pdf.text(b.sixes.toString(), 160, y + 4);
+                pdf.text(b.fours.toString(), 135, y + 4);
+                pdf.text(b.sixes.toString(), 150, y + 4);
                 const sr = b.ballsFaced > 0 ? (b.runs / b.ballsFaced * 100).toFixed(1) : '0.0';
-                pdf.text(sr, 180, y + 4);
-                y += 9;
+                pdf.text(sr, 165, y + 4);
+                y += 7;
             });
 
-            // Extras
+            // Extras & Total
+            pdf.setFontSize(7);
             pdf.setFont('helvetica', 'bold');
-            pdf.text(`Extras: ${formatExtraString(extras)}`, 20, y + 4);
-            y += 8;
+            pdf.text(`EXTRAS: ${formatExtraString(extras)}`, 18, y + 2);
+            y += 6;
 
             // Bowlers Table
             pdf.setFillColor(245, 245, 245);
-            pdf.rect(15, y, pageWidth - 30, 6, 'F');
-            pdf.setTextColor(100, 100, 100);
-            pdf.text('Bowler', 20, y + 4.5);
-            pdf.text('O', 100, y + 4.5);
-            pdf.text('M', 120, y + 4.5);
-            pdf.text('R', 140, y + 4.5);
-            pdf.text('W', 160, y + 4.5);
-            pdf.text('ECO', 180, y + 4.5);
-            y += 6;
+            pdf.rect(15, y, pageWidth - 30, 5, 'F');
+            pdf.setTextColor(80, 80, 80);
+            pdf.text('BOWLER', 18, y + 3.5);
+            pdf.text('O', 105, y + 3.5);
+            pdf.text('M', 120, y + 3.5);
+            pdf.text('R', 135, y + 3.5);
+            pdf.text('W', 150, y + 3.5);
+            pdf.text('ECO', 165, y + 3.5);
+            y += 5;
 
             pdf.setTextColor(0, 0, 0);
+            pdf.setFontSize(8);
             bowlers.forEach(bw => {
-                pdf.text(bw.name, 20, y + 4);
-                pdf.text(bw.overs.toString(), 100, y + 4);
+                pdf.text(bw.name, 18, y + 4);
+                pdf.text(bw.overs.toString(), 105, y + 4);
                 pdf.text((bw.maidens || 0).toString(), 120, y + 4);
-                pdf.text(bw.runsConceded.toString(), 140, y + 4);
-                pdf.text(bw.wickets.toString(), 160, y + 4);
+                pdf.text(bw.runsConceded.toString(), 135, y + 4);
+                pdf.text(bw.wickets.toString(), 150, y + 4);
                 const eco = bw.overs > 0 ? (bw.runsConceded / bw.overs).toFixed(2) : '0.00';
-                pdf.text(eco, 180, y + 4);
+                pdf.text(eco, 165, y + 4);
                 y += 6;
             });
-            y += 5;
+            y += 10;
         };
 
         addInningsTable(teamA, runsA, wicketsA, oversA, firstInningsBatsmen, firstInningsBowlers, firstInningsExtras);
-        y += 5;
+
+        // Check if we need to be more compact for the second innings
+        if (y > 220) {
+            y -= 5; // Tighter gap
+        }
+
         addInningsTable(teamB, runsB, wicketsB, oversB, secondInningsBatsmen, secondInningsBowlers, secondInningsExtras);
 
-        // Footer
-        y = 285;
+        // Footer (Fixed at bottom)
+        pdf.setDrawColor(240, 240, 240);
+        pdf.line(15, pageHeight - 20, pageWidth - 15, pageHeight - 20);
         pdf.setFontSize(7);
         pdf.setTextColor(150, 150, 150);
-        centerText(`© ${new Date().getFullYear()} PIYUSH CRICKET - Elite Match Analytics`, 7, 'normal', [150, 150, 150]);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Generated on ${new Date().toLocaleString()} • PIYUSH CRICKET Analytics`, 15, pageHeight - 15);
+        pdf.text(`Page 1 of 1`, pageWidth - 30, pageHeight - 15);
 
         return pdf;
     };
@@ -232,12 +250,12 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
                     <table className="modern-table">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th style={{ width: '45%' }}>Batter</th>
-                                <th className="text-right">R</th>
-                                <th className="text-right">B</th>
-                                <th className="text-right">4s</th>
-                                <th className="text-right">6s</th>
-                                <th className="text-right">SR</th>
+                                <th className="text-[0.6rem] sm:text-[0.65rem]" style={{ width: '40%' }}>Batter</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">R</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">B</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">4s</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">6s</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">SR</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -284,12 +302,12 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
                     <table className="modern-table">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th style={{ width: '45%' }}>Bowler</th>
-                                <th className="text-right">O</th>
-                                <th className="text-right">M</th>
-                                <th className="text-right">R</th>
-                                <th className="text-right">W</th>
-                                <th className="text-right">ECO</th>
+                                <th className="text-[0.6rem] sm:text-[0.65rem]" style={{ width: '40%' }}>Bowler</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">O</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">M</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">R</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">W</th>
+                                <th className="text-right text-[0.6rem] sm:text-[0.65rem]">ECO</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -348,7 +366,7 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
                     <div className="inline-block px-3 py-1 bg-saffron text-white rounded-full text-[0.6rem] font-black uppercase tracking-widest mb-4">
                         Match Concluded
                     </div>
-                    <h1 className="text-white font-black text-3xl tracking-tight mb-8">
+                    <h1 className="text-white font-black text-2xl sm:text-3xl tracking-tight mb-8">
                         {getWinnerMessage()}
                     </h1>
 

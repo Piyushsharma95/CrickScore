@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCcw, UserPlus, MoreHorizontal, ArrowRightLeft, Hand } from 'lucide-react';
+import { RotateCcw, UserPlus, MoreHorizontal } from 'lucide-react';
 import type { ExtraType, WicketType } from '../types';
 
 interface ControlPanelProps {
@@ -56,14 +56,14 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ onBowl, onUndo, rece
             </div>
 
             {/* Main Interactive Grid */}
-            <div className="grid grid-cols-5 gap-4 px-2">
+            <div className="grid grid-cols-12 gap-2 sm:gap-4 px-1 sm:px-2">
                 {/* Left Side: Runs Pad (Vertical Emphasis) */}
-                <div className="col-span-2 grid grid-cols-2 gap-3">
+                <div className="col-span-5 grid grid-cols-2 gap-2 sm:gap-3">
                     {[0, 1, 2, 3, 4, 6].map(r => (
                         <button
                             key={r}
                             onClick={() => handleRun(r)}
-                            className="run-circle !w-full shadow-md"
+                            className="run-circle !w-full shadow-md !text-lg"
                         >
                             {r}
                         </button>
@@ -71,13 +71,13 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ onBowl, onUndo, rece
                 </div>
 
                 {/* Right Side: Modifiers */}
-                <div className="col-span-3 flex flex-col gap-3">
+                <div className="col-span-7 flex flex-col gap-2 sm:gap-3">
                     <div className="grid grid-cols-2 gap-2">
                         {(['Wide', 'NoBall', 'Bye', 'LegBye'] as ExtraType[]).map(type => (
                             <button
                                 key={type}
                                 onClick={() => toggleExtra(type)}
-                                className={`extra-chip-btn !py-3 ${selectedExtra === type ? 'active' : ''}`}
+                                className={`extra-chip-btn !py-2 sm:!py-3 ${selectedExtra === type ? 'active' : ''}`}
                             >
                                 {type === 'NoBall' ? 'NB' : type}
                             </button>
@@ -86,18 +86,16 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({ onBowl, onUndo, rece
 
                     <button
                         onClick={() => setIsWicket(!isWicket)}
-                        className={`extra-chip-btn !py-4 wicket-btn ${isWicket ? 'active' : ''}`}
+                        className={`extra-chip-btn !py-3 sm:!py-4 wicket-btn ${isWicket ? 'active' : ''}`}
                     >
-                        {isWicket ? 'CONFIRM WICKET' : 'OUT / WICKET'}
+                        {isWicket ? 'CONFIRM OUT' : 'WICKET'}
                     </button>
 
                     <div className="flex gap-2 mt-auto">
-                        <button className="flex-1 p-3 bg-slate-100 text-slate-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2 hover:bg-slate-200">
-                            <Hand className="w-4 h-4" />
+                        <button className="flex-1 p-2 bg-slate-100 text-slate-700 rounded-xl font-bold text-[0.65rem] sm:text-xs flex items-center justify-center gap-1 hover:bg-slate-200">
                             RETIRE
                         </button>
-                        <button className="flex-1 p-3 bg-blue-50 text-blue-700 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
-                            <ArrowRightLeft className="w-4 h-4" />
+                        <button className="flex-1 p-2 bg-blue-50 text-blue-700 rounded-xl font-bold text-[0.65rem] sm:text-xs flex items-center justify-center gap-1">
                             SWAP
                         </button>
                     </div>

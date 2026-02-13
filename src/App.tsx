@@ -125,12 +125,12 @@ function App() {
             <table className="modern-table">
               <thead className="bg-slate-50">
                 <tr>
-                  <th style={{ width: '40%' }}>Batsman</th>
-                  <th className="text-right">R</th>
-                  <th className="text-right">B</th>
-                  <th className="text-right">4s</th>
-                  <th className="text-right">6s</th>
-                  <th className="text-right">SR</th>
+                  <th className="text-[0.6rem] sm:text-[0.65rem]" style={{ width: '40%' }}>Batsman</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">R</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">B</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">4s</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">6s</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">SR</th>
                 </tr>
               </thead>
               <tbody>
@@ -145,12 +145,12 @@ function App() {
             <table className="modern-table">
               <thead className="bg-slate-50">
                 <tr>
-                  <th style={{ width: '40%' }}>Bowler</th>
-                  <th className="text-right">O</th>
-                  <th className="text-right">M</th>
-                  <th className="text-right">R</th>
-                  <th className="text-right">W</th>
-                  <th className="text-right">ER</th>
+                  <th className="text-[0.6rem] sm:text-[0.65rem]" style={{ width: '40%' }}>Bowler</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">O</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">M</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">R</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">W</th>
+                  <th className="text-right text-[0.6rem] sm:text-[0.65rem]">ER</th>
                 </tr>
               </thead>
               <tbody>

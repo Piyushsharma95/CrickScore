@@ -15,17 +15,17 @@
 
   /* Layout */
   .app-container {
-    @apply max-w-[600px] mx-auto min-h-screen bg-white flex flex-col relative shadow-2xl;
+    @apply w-full max-w-[600px] mx-auto min-h-screen bg-white flex flex-col relative shadow-2xl overflow-x-hidden;
   }
 
   @media (min-width: 1024px) {
     .app-container {
-      @apply max-w-[500px] my-6 min-h-[calc(100vh-3rem)] rounded-2xl overflow-hidden;
+      @apply max-w-[480px] my-6 min-h-[calc(100vh-3rem)] rounded-2xl;
     }
   }
 
   .main-content {
-    @apply flex-1 p-5 overflow-y-auto;
+    @apply flex-1 p-4 overflow-y-auto;
   }
 
   /* Header */
