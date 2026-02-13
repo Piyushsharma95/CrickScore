@@ -12,6 +12,10 @@ export default {
                 'p-blue-bg': '#eef2ff',
                 'saffron': '#FF6600',
                 'saffron-light': '#ff8533',
+                'india-saffron': '#FF9933',
+                'india-green': '#138808',
+                'india-blue': '#0055A6', // Standard lighter blue for jersey highlights
+                'india-blue-dark': '#001D4A', // Deep jersey blue
             },
         },
     },

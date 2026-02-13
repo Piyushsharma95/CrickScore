@@ -30,8 +30,12 @@ export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
         <div className="app-container">
             <header className="app-header">
                 <div className="flex items-center gap-2">
-                    <Trophy className="w-5 h-5" />
-                    <span className="header-title">PIYUSH CRICKET</span>
+                    <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full border border-white/20">
+                        <div className="flex-1 bg-india-saffron"></div>
+                        <div className="flex-1 bg-white"></div>
+                        <div className="flex-1 bg-india-green"></div>
+                    </div>
+                    <span className="header-title tracking-widest leading-none">PIYUSH CRICKET</span>
                 </div>
                 <div className="flex gap-4">
                     <Bell className="w-5 h-5 cursor-pointer text-white/80" />

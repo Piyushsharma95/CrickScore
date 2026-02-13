@@ -366,7 +366,12 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
             <header className="app-header shadow-none border-b border-white/10">
                 <div className="flex items-center gap-3">
                     <ArrowLeft className="w-5 h-5 cursor-pointer text-white/80 hover:text-white" onClick={onRestart} />
-                    <span className="header-title !text-white !uppercase tracking-widest">Match Report</span>
+                    <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full border border-white/20">
+                        <div className="flex-1 bg-india-saffron"></div>
+                        <div className="flex-1 bg-white"></div>
+                        <div className="flex-1 bg-india-green"></div>
+                    </div>
+                    <span className="header-title !text-white !uppercase tracking-widest leading-none">Match Report</span>
                 </div>
                 <div className="flex gap-4">
                     <Share2 className="w-5 h-5 cursor-pointer text-white/80 hover:text-white" onClick={shareMatch} />
@@ -424,8 +429,12 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
 
                     <div className="mb-10">
                         <div className="flex items-center gap-2 mb-4 px-1">
-                            <Users className="w-4 h-4 text-p-blue" />
-                            <span className="text-[0.7rem] font-black text-p-blue uppercase tracking-widest">First Innings Summary</span>
+                            <div className="flex flex-col w-1.2 h-3.5 overflow-hidden rounded-full border border-india-blue/20">
+                                <div className="flex-1 bg-india-saffron"></div>
+                                <div className="flex-1 bg-white"></div>
+                                <div className="flex-1 bg-india-green"></div>
+                            </div>
+                            <span className="text-[0.7rem] font-black text-p-blue uppercase tracking-widest leading-none">First Innings Summary</span>
                         </div>
                         <InningsSection
                             team={teamA}
@@ -441,8 +450,12 @@ export const MatchSummary: React.FC<MatchSummaryProps> = (props) => {
 
                     <div className="mb-10">
                         <div className="flex items-center gap-2 mb-4 px-1">
-                            <Users className="w-4 h-4 text-p-blue" />
-                            <span className="text-[0.7rem] font-black text-p-blue uppercase tracking-widest">Second Innings Summary</span>
+                            <div className="flex flex-col w-1.2 h-3.5 overflow-hidden rounded-full border border-india-blue/20">
+                                <div className="flex-1 bg-india-saffron"></div>
+                                <div className="flex-1 bg-white"></div>
+                                <div className="flex-1 bg-india-green"></div>
+                            </div>
+                            <span className="text-[0.7rem] font-black text-p-blue uppercase tracking-widest leading-none">Second Innings Summary</span>
                         </div>
                         <InningsSection
                             team={teamB}

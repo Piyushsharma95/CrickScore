@@ -20,7 +20,10 @@
 
   @media (min-width: 1024px) {
     .app-container {
-      @apply max-w-[480px] my-6 min-h-[calc(100vh-3rem)] rounded-2xl;
+      @apply max-w-[480px] my-6 min-h-[calc(100vh-3rem)] rounded-3xl;
+      /* Jersey texture effect */
+      background-image: radial-gradient(circle at 10% 20%, rgba(0, 51, 153, 0.02) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(19, 136, 8, 0.02) 0%, transparent 20%);
     }
   }
 
@@ -30,8 +33,24 @@
 
   /* Header */
   .app-header {
-    @apply sticky top-0 z-50 px-6 py-5 flex items-center justify-between shadow-md text-white;
-    background: linear-gradient(135deg, #003399 0%, #001f5c 100%);
+    @apply sticky top-0 z-50 px-6 py-5 flex items-center justify-between shadow-lg text-white relative overflow-hidden;
+    /* Indian Jersey Deep Blue Gradient */
+    background: linear-gradient(135deg, #001D4A 0%, #003399 50%, #0055A6 100%);
+  }
+
+  /* Tricolor Bottom Strip */
+  .app-header::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-full h-1;
+    background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%, #138808 100%);
+    box-shadow: 0 -2px 10px rgba(255, 153, 51, 0.3);
+  }
+
+  /* Jersey Shoulder Pattern (Subtle stripes) */
+  .app-header::before {
+    content: '';
+    @apply absolute top-0 right-0 w-32 h-full opacity-10 pointer-events-none;
+    background: repeating-linear-gradient(45deg, transparent, transparent 10px, #FF9933 10px, #FF9933 20px);
   }
 
   .header-title {
@@ -45,11 +64,18 @@
 
   /* Buttons */
   .btn-p {
-    @apply bg-p-blue text-white border-none px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-widest cursor-pointer transition-all shadow-lg;
+    @apply text-white border-none px-6 py-3 rounded-xl font-extrabold text-xs uppercase tracking-widest cursor-pointer transition-all shadow-lg relative overflow-hidden;
+    background: linear-gradient(135deg, #003399 0%, #001D4A 100%);
+  }
+
+  .btn-p::before {
+    content: '';
+    @apply absolute top-0 left-0 w-full h-0.5 opacity-50;
+    background: linear-gradient(90deg, #FF9933, #FFFFFF, #138808);
   }
 
   .btn-p:hover {
-    @apply brightness-110 -translate-y-0.5;
+    @apply brightness-110 -translate-y-0.5 shadow-xl;
   }
 
   .btn-p:active {
@@ -83,7 +109,7 @@
 
   /* Control Panel */
   .control-panel {
-    @apply bg-white border-t-2 border-slate-100 p-5 shadow-2xl;
+    @apply bg-white border-t-4 border-india-blue p-5 shadow-2xl;
   }
 
   .extra-chip-btn {
@@ -128,12 +154,19 @@
 
   /* Score Display */
   .score-card {
-    @apply p-6 rounded-xl border border-p-blue-bg mb-5 shadow-sm;
-    background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+    @apply p-6 rounded-2xl border-none mb-5 shadow-xl relative overflow-hidden;
+    background: white;
+    box-shadow: 0 10px 25px -5px rgba(0, 51, 153, 0.1);
+  }
+
+  .score-card::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1.5;
+    background: linear-gradient(to bottom, #FF9933 0%, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%, #138808 100%);
   }
 
   .score-text {
-    @apply text-5xl font-black text-p-blue tracking-tight leading-none;
+    @apply text-5xl font-black tracking-tight leading-none text-india-blue-dark;
   }
 
   /* Tables */
@@ -171,7 +204,15 @@
   }
 
   .match-card-header {
-    @apply px-4 py-3 bg-p-blue text-white flex justify-between items-center;
+    @apply px-4 py-3 text-white flex justify-between items-center relative overflow-hidden;
+    background: linear-gradient(to right, #001D4A, #003399);
+  }
+
+  /* Vertical Tricolor Accent on Card Header */
+  .match-card-header::before {
+    content: '';
+    @apply absolute left-0 top-0 bottom-0 w-1;
+    background: linear-gradient(to bottom, #FF9933, #FFFFFF, #138808);
   }
 
   .team-name-lg {
@@ -195,14 +236,24 @@
   }
 
   .result-hero-p {
-    @apply px-6 py-12 text-center text-white rounded-b-[40px] shadow-lg relative;
-    background: linear-gradient(to bottom, #003399 0%, #001f5c 100%);
+    @apply px-6 py-12 text-center text-white rounded-b-[40px] shadow-2xl relative overflow-hidden;
+    background: linear-gradient(160deg, #001D4A 0%, #003399 100%);
   }
 
   .result-hero-p::before {
     content: '';
-    @apply absolute top-0 left-0 right-0 h-1 opacity-80;
-    background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
+    @apply absolute top-0 left-0 right-0 h-1.5 opacity-100;
+    /* Wider Tricolor Strip */
+    background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+    box-shadow: 0 0 15px rgba(255, 153, 51, 0.5);
+  }
+
+  /* Add Chakra spin effect or similar if possible, or just a subtle bg pattern */
+  .result-hero-p::after {
+    content: '';
+    @apply absolute bottom-0 right-0 w-48 h-48 opacity-5 rounded-full pointer-events-none;
+    background: radial-gradient(circle, #0055A6 0%, transparent 70%);
+    transform: translate(20%, 20%);
   }
 
   .mom-card-premium {

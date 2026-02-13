@@ -53,8 +53,12 @@ function App() {
       <div className="app-container">
         <header className="app-header">
           <div className="flex items-center gap-3">
-            <Zap className="w-5 h-5 text-saffron fill-saffron" />
-            <span className="header-title uppercase tracking-widest">Innings Break</span>
+            <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full border border-white/20">
+              <div className="flex-1 bg-india-saffron"></div>
+              <div className="flex-1 bg-white"></div>
+              <div className="flex-1 bg-india-green"></div>
+            </div>
+            <span className="header-title uppercase tracking-widest leading-none">Innings Break</span>
           </div>
         </header>
         <main className="main-content flex flex-col items-center justify-center p-8 text-center bg-white">
@@ -107,7 +111,16 @@ function App() {
       <header className="app-header shadow-none">
         <div className="flex items-center gap-4">
           <ArrowLeft className="w-6 h-6 cursor-pointer opacity-80 hover:opacity-100" onClick={restart} />
-          <span className="header-title uppercase tracking-widest">{matchState.battingTeam} v/s {matchState.bowlingTeam}</span>
+          <div className="flex items-center gap-2">
+            <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full border border-white/20">
+              <div className="flex-1 bg-india-saffron"></div>
+              <div className="flex-1 bg-white"></div>
+              <div className="flex-1 bg-india-green"></div>
+            </div>
+            <span className="header-title uppercase tracking-widest leading-none">
+              {matchState.battingTeam} v/s {matchState.bowlingTeam}
+            </span>
+          </div>
         </div>
         <div className="flex items-center gap-4">
           <button
