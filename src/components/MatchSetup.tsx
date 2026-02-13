@@ -30,9 +30,11 @@ export const MatchSetup: React.FC<MatchSetupProps> = ({ onStart }) => {
         <div className="app-container">
             <header className="app-header">
                 <div className="flex items-center gap-2">
-                    <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full border border-white/20">
+                    <div className="flex flex-col w-5 h-3.5 overflow-hidden rounded-sm border border-white/20 shadow-sm mr-0.5">
                         <div className="flex-1 bg-india-saffron"></div>
-                        <div className="flex-1 bg-white"></div>
+                        <div className="flex-1 bg-white relative flex items-center justify-center">
+                            <div className="w-[3px] h-[3px] rounded-full border-[0.5px] border-india-blue bg-white"></div>
+                        </div>
                         <div className="flex-1 bg-india-green"></div>
                     </div>
                     <span className="header-title tracking-widest leading-none">PIYUSH CRICKET</span>

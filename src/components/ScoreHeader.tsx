@@ -24,9 +24,11 @@ export const ScoreHeader: React.FC<ScoreHeaderProps> = ({
             <div className="flex justify-between items-start mb-4">
                 <div className="flex flex-col">
                     <div className="flex items-center gap-2 mb-1">
-                        <div className="flex flex-col w-1.5 h-4 overflow-hidden rounded-full shadow-sm">
+                        <div className="flex flex-col w-5 h-3.5 overflow-hidden rounded-sm border border-slate-200 shadow-sm mr-0.5">
                             <div className="flex-1 bg-india-saffron"></div>
-                            <div className="flex-1 bg-white"></div>
+                            <div className="flex-1 bg-white relative flex items-center justify-center">
+                                <div className="w-[3px] h-[3px] rounded-full border-[0.5px] border-india-blue bg-white"></div>
+                            </div>
                             <div className="flex-1 bg-india-green"></div>
                         </div>
                         <span className="text-[0.7rem] font-bold text-india-blue uppercase tracking-[0.15em]">
