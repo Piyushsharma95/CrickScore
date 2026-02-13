@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { useMatchScoring } from './hooks/useMatchScoring';
 import { ScoreHeader } from './components/ScoreHeader';
 import { BatsmanCard } from './components/BatsmanCard';
@@ -8,7 +9,8 @@ import { PlayerSelectionModal } from './components/PlayerSelectionModal';
 import { BowlerSelectionModal } from './components/BowlerSelectionModal';
 import { BatsmanSelectionModal } from './components/BatsmanSelectionModal';
 import { MatchSummary } from './components/MatchSummary';
-import { ArrowLeft, TrendingUp, Zap } from 'lucide-react';
+import { FullScorecardModal } from './components/FullScorecardModal';
+import { ArrowLeft, TrendingUp, Zap, FileText } from 'lucide-react';
 import type { ExtraType, WicketType, Batsman } from './types';
 
 function App() {
@@ -21,12 +23,16 @@ function App() {
     selectNextBowler,
     selectNextBatsman,
     nextInnings,
-    restart
+    restart,
+    retireBatsman,
+    swapBatsmen
   } = useMatchScoring();
 
+  const [isFullScorecardOpen, setIsFullScorecardOpen] = useState(false);
 
-  const handleBowl = (runs: number, extraType: ExtraType, wicketType: WicketType) => {
-    bowlBall(runs, extraType, wicketType);
+
+  const handleBowl = (runs: number, extraType: ExtraType, wicketType: WicketType, fielderName?: string) => {
+    bowlBall(runs, extraType, wicketType, fielderName);
   };
 
   if (matchState.status === 'SETUP' && matchState.currentBatsmen.length === 0) {
@@ -103,9 +109,18 @@ function App() {
           <ArrowLeft className="w-6 h-6 cursor-pointer opacity-80 hover:opacity-100" onClick={restart} />
           <span className="header-title uppercase tracking-widest">{matchState.battingTeam} v/s {matchState.bowlingTeam}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-2 h-2 bg-saffron rounded-full animate-pulse"></div>
-          <span className="text-[0.6rem] font-black text-white uppercase tracking-widest">Live Match</span>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsFullScorecardOpen(true)}
+            className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-white/20 transition-all border border-white/10"
+            title="View Full Scorecard"
+          >
+            <FileText className="w-5 h-5 text-white" />
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 bg-saffron rounded-full animate-pulse"></div>
+            <span className="text-[0.6rem] font-black text-white uppercase tracking-widest">Live</span>
+          </div>
         </div>
       </header>
 
@@ -163,6 +178,8 @@ function App() {
         <ControlPanel
           onBowl={handleBowl}
           onUndo={undo}
+          onRetire={retireBatsman}
+          onSwap={swapBatsmen}
           recentBalls={matchState.history.filter((_, idx: number) => {
             const previousLegalBalls = matchState.history.slice(0, idx).filter(h => h.isLegal).length;
             return previousLegalBalls >= matchState.overs * 6;
@@ -180,6 +197,18 @@ function App() {
       <BatsmanSelectionModal
         isOpen={matchState.isBatterSelectionOpen}
         onSelect={selectNextBatsman}
+      />
+
+      <FullScorecardModal
+        isOpen={isFullScorecardOpen}
+        onClose={() => setIsFullScorecardOpen(false)}
+        battingTeam={matchState.battingTeam}
+        batsmen={matchState.battingTeamPlayers}
+        bowlers={matchState.bowlingTeamBowlers}
+        totalRuns={matchState.totalRuns}
+        wickets={matchState.wickets}
+        overs={matchState.overs}
+        ballsInOver={matchState.ballsInCurrentOver}
       />
     </div>
   );

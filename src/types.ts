@@ -43,6 +43,7 @@ export interface BallEvent {
     wicket: WicketType;
     bowlerId: string;
     batsmanId: string;
+    fielderName?: string;
 }
 
 export interface MatchConfig {

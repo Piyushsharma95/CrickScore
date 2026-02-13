@@ -38,14 +38,16 @@ const INITIAL_STATE: MatchState = {
 type Action =
     | { type: 'START_MATCH'; payload: { teamA: string; teamB: string; overs: number; battingFirst: 'TeamA' | 'TeamB' } }
     | { type: 'SET_OPENING_PLAYERS'; payload: { striker: string; nonStriker: string; bowler: string } }
-    | { type: 'BOWL_BALL'; payload: { runs: number; extraType: ExtraType; wicketType: WicketType } }
+    | { type: 'BOWL_BALL'; payload: { runs: number; extraType: ExtraType; wicketType: WicketType; fielderName?: string } }
     | { type: 'SELECT_NEXT_BOWLER'; payload: { bowlerName: string; isNew: boolean; existingId?: string } }
     | { type: 'SELECT_NEXT_BATSMAN'; payload: { name: string } }
     | { type: 'NEXT_INNINGS' }
     | { type: 'RESTART' }
     | { type: 'UNDO' }
     | { type: 'UPDATE_BATSMAN_NAME'; payload: { id: string; name: string } }
-    | { type: 'UPDATE_BOWLER_NAME'; payload: { name: string } };
+    | { type: 'UPDATE_BOWLER_NAME'; payload: { name: string } }
+    | { type: 'RETIRE_BATSMAN' }
+    | { type: 'SWAP_BATSMEN' };
 
 function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: string, name: string, reason: string } {
     let bestPlayer: any = null;
@@ -181,7 +183,7 @@ function matchReducer(state: MatchState, action: Action): MatchState {
         case 'BOWL_BALL': {
             if (state.status !== 'IN_PROGRESS' || !state.currentBowler) return state;
 
-            const { runs, extraType, wicketType } = action.payload;
+            const { runs, extraType, wicketType, fielderName } = action.payload;
             const batsmen = state.currentBatsmen.map(b => ({ ...b }));
             const striker = batsmen.find(b => b.isStriker);
             if (!striker) return state;
@@ -284,14 +286,18 @@ function matchReducer(state: MatchState, action: Action): MatchState {
             // Handle Wicket marking for batsman
             let newFow = [...state.fow];
             if (finalWicketType !== 'None') {
-                const outBatsman = (finalWicketType === 'RunOut') ? batsmen[0] : batsmen.find(b => b.isStriker);
+                // For Run Out, usually the one who gets out can be either striker or non-striker.
+                // For simplicity, we assume the ball was faced by striker, but we should mark which one got out.
+                // In most other cases, it's the striker who is out.
+                const outBatsman = batsmen.find(b => b.isStriker);
                 if (outBatsman) {
                     outBatsman.isOut = true;
                     if (finalWicketType === 'Bowled') outBatsman.out = `b ${currentBowler.name}`;
-                    else if (finalWicketType === 'Caught') outBatsman.out = `c ? b ${currentBowler.name}`;
+                    else if (finalWicketType === 'Caught') outBatsman.out = `c ${fielderName || '?'} b ${currentBowler.name}`;
                     else if (finalWicketType === 'LBW') outBatsman.out = `lbw b ${currentBowler.name}`;
                     else if (finalWicketType === 'RunOut') outBatsman.out = `run out`;
-                    else if (finalWicketType === 'Stumped') outBatsman.out = `st ? b ${currentBowler.name}`;
+                    else if (finalWicketType === 'Stumped') outBatsman.out = `st ${fielderName || '?'} b ${currentBowler.name}`;
+                    else if (finalWicketType === 'HitWicket') outBatsman.out = `hit wicket`;
                     else outBatsman.out = finalWicketType;
 
                     newFow.push({
@@ -310,7 +316,8 @@ function matchReducer(state: MatchState, action: Action): MatchState {
                 wicket: finalWicketType,
                 isLegal,
                 bowlerId: currentBowler.id,
-                batsmanId: striker.id
+                batsmanId: striker.id,
+                fielderName
             };
 
             const newState: MatchState = {
@@ -413,6 +420,32 @@ function matchReducer(state: MatchState, action: Action): MatchState {
             };
             return saveHistory(newState);
         }
+        case 'RETIRE_BATSMAN': {
+            const striker = state.currentBatsmen.find(b => b.isStriker);
+            if (!striker || state.status !== 'IN_PROGRESS') return state;
+
+            const updatedBatsmen = state.currentBatsmen.map(b =>
+                b.id === striker.id ? { ...b, isOut: true, out: 'retired' } : b
+            );
+
+            const newState = {
+                ...state,
+                currentBatsmen: updatedBatsmen.filter(b => !b.isOut),
+                battingTeamPlayers: state.battingTeamPlayers.map(p => {
+                    const updated = updatedBatsmen.find(b => b.id === p.id);
+                    return updated ? updated : p;
+                }),
+                isBatterSelectionOpen: true
+            };
+            return saveHistory(newState);
+        }
+        case 'SWAP_BATSMEN': {
+            const newState = {
+                ...state,
+                currentBatsmen: state.currentBatsmen.map(b => ({ ...b, isStriker: !b.isStriker }))
+            };
+            return saveHistory(newState);
+        }
         default:
             return state;
     }
@@ -432,7 +465,7 @@ export function useMatchScoring() {
         matchState,
         startMatch: (teamA: string, teamB: string, overs: number, battingFirst: 'TeamA' | 'TeamB') => dispatch({ type: 'START_MATCH', payload: { teamA, teamB, overs, battingFirst } }),
         setOpeningPlayers: (striker: string, nonStriker: string, bowler: string) => dispatch({ type: 'SET_OPENING_PLAYERS', payload: { striker, nonStriker, bowler } }),
-        bowlBall: (runs: number, extraType: ExtraType, wicketType: WicketType) => dispatch({ type: 'BOWL_BALL', payload: { runs, extraType, wicketType } }),
+        bowlBall: (runs: number, extraType: ExtraType, wicketType: WicketType, fielderName?: string) => dispatch({ type: 'BOWL_BALL', payload: { runs, extraType, wicketType, fielderName } }),
         selectNextBowler: (name: string, isNew: boolean, id?: string) => dispatch({ type: 'SELECT_NEXT_BOWLER', payload: { bowlerName: name, isNew, existingId: id } }),
         selectNextBatsman: (name: string) => dispatch({ type: 'SELECT_NEXT_BATSMAN', payload: { name } }),
         nextInnings: () => dispatch({ type: 'NEXT_INNINGS' }),
@@ -442,6 +475,8 @@ export function useMatchScoring() {
         },
         undo: () => dispatch({ type: 'UNDO' }),
         updateBatsmanName: (id: string, name: string) => dispatch({ type: 'UPDATE_BATSMAN_NAME', payload: { id, name } }),
-        updateBowlerName: (name: string) => dispatch({ type: 'UPDATE_BOWLER_NAME', payload: { name } })
+        updateBowlerName: (name: string) => dispatch({ type: 'UPDATE_BOWLER_NAME', payload: { name } }),
+        retireBatsman: () => dispatch({ type: 'RETIRE_BATSMAN' }),
+        swapBatsmen: () => dispatch({ type: 'SWAP_BATSMEN' })
     };
 }
