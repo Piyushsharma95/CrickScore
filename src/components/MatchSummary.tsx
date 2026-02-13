@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { ArrowLeft, Share2, Download, Trophy, Target, Clock, Star, Users, ChevronRight } from 'lucide-react';
 import jsPDF from 'jspdf';
 import type { Batsman, Bowler, FOW } from '../types';

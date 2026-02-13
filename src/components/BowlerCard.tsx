@@ -1,4 +1,4 @@
-import React from 'react';
+// No unnecessary React import
 import type { Bowler } from '../types';
 
 interface BowlerCardProps {

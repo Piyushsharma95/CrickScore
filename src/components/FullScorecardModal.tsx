@@ -1,4 +1,3 @@
-import React from 'react';
 import { X, Trophy, Users, Target } from 'lucide-react';
 import type { Batsman, Bowler } from '../types';
 
@@ -14,7 +13,7 @@ interface FullScorecardModalProps {
     ballsInOver: number;
 }
 
-export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
+export const FullScorecardModal = ({
     isOpen,
     onClose,
     battingTeam,
@@ -24,7 +23,7 @@ export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
     wickets,
     overs,
     ballsInOver
-}) => {
+}: FullScorecardModalProps) => {
     if (!isOpen) return null;
 
     return (
@@ -86,7 +85,7 @@ export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-slate-50">
-                                {batsmen.map((b) => (
+                                {batsmen.map((b: Batsman) => (
                                     <tr key={b.id} className={b.isStriker ? 'bg-p-blue-bg/20' : ''}>
                                         <td className="py-3 pl-4">
                                             <div className="flex flex-col">
@@ -125,7 +124,7 @@ export const FullScorecardModal: React.FC<FullScorecardModalProps> = ({
                                 </tr>
                             </thead>
                             <tbody className="bg-white divide-y divide-slate-50">
-                                {bowlers.map((bw) => (
+                                {bowlers.map((bw: Bowler) => (
                                     <tr key={bw.id}>
                                         <td className="py-3 pl-4">
                                             <span className="text-[0.75rem] font-bold text-slate-800">{bw.name}</span>

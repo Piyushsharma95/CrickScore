@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { RotateCcw, UserPlus, MoreHorizontal } from 'lucide-react';
 import type { ExtraType, WicketType, BallEvent } from '../types';
 

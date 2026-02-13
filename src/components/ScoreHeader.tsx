@@ -1,4 +1,4 @@
-import React from 'react';
+// No unnecessary React import
 import { Share2, Zap } from 'lucide-react';
 
 interface ScoreHeaderProps {

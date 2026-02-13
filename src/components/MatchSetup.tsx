@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Settings, Bell, Trophy, Swords, Calendar, Clock, MapPin } from 'lucide-react';
 
 interface MatchSetupProps {

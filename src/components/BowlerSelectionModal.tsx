@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Target, UserPlus, Users, ChevronRight } from 'lucide-react';
 import type { Bowler } from '../types';
 
