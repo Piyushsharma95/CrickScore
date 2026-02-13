@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { RotateCcw, UserPlus, MoreHorizontal } from 'lucide-react';
-import type { ExtraType, WicketType } from '../types';
+import type { ExtraType, WicketType, BallEvent } from '../types';
 
 interface ControlPanelProps {
     onBowl: (runs: number, extraType: ExtraType, wicketType: WicketType, fielderName?: string) => void;
     onUndo: () => void;
     onRetire: () => void;
     onSwap: () => void;
-    recentBalls: any[];
+    recentBalls: BallEvent[];
 }
 
 export const ControlPanel: React.FC<ControlPanelProps> = ({ onBowl, onUndo, onRetire, onSwap, recentBalls }) => {

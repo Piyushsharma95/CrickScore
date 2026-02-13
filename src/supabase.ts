@@ -6,7 +6,9 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-export const saveMatch = async (matchData: any) => {
+import type { MatchState } from './types';
+
+export const saveMatch = async (matchData: MatchState) => {
     if (!supabaseUrl || !supabaseAnonKey) {
         console.warn('Supabase keys missing. Saving to localStorage instead.');
         const history = JSON.parse(localStorage.getItem('match_history') || '[]');

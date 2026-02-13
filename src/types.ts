@@ -98,6 +98,6 @@ export interface MatchState {
     isFreeHit: boolean; // Next ball is a Free Hit (after No Ball)
     message?: string; // For alerts like "End of Innings"
     manOfTheMatch?: Player & { reason: string };
-    pastStates?: any[];
+    pastStates?: MatchState[];
     lastBowlerId: string | null;
 }

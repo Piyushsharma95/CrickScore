@@ -50,7 +50,7 @@ type Action =
     | { type: 'SWAP_BATSMEN' };
 
 function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: string, name: string, reason: string } {
-    let bestPlayer: any = null;
+    let bestPlayer: Batsman | Bowler | null = null;
     let maxPoints = -1;
     let reason = '';
 
@@ -126,16 +126,17 @@ function matchReducer(state: MatchState, action: Action): MatchState {
         }
         case 'RESTART':
             return INITIAL_STATE;
-        case 'UNDO':
+        case 'UNDO': {
             if (!state.pastStates || state.pastStates.length === 0) return state;
             const [previous, ...remaining] = state.pastStates;
             return { ...previous, pastStates: remaining };
+        }
 
         case 'NEXT_INNINGS': {
             const newState = {
                 ...state,
                 innings: 2,
-                status: 'SETUP',
+                status: 'SETUP' as MatchStatus,
                 targetRuns: state.totalRuns + 1,
                 firstInningsBatsmen: state.battingTeamPlayers,
                 firstInningsBowlers: state.bowlingTeamBowlers,
@@ -164,8 +165,8 @@ function matchReducer(state: MatchState, action: Action): MatchState {
         }
         case 'SET_OPENING_PLAYERS': {
             const { striker, nonStriker, bowler } = action.payload;
-            const b1: Batsman = { id: `b-${Date.now()}-1`, name: striker, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: true };
-            const b2: Batsman = { id: `b-${Date.now()}-2`, name: nonStriker, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: false };
+            const b1: Batsman = { id: `b-${Date.now()}-1`, name: striker, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: true, isOut: false, out: undefined };
+            const b2: Batsman = { id: `b-${Date.now()}-2`, name: nonStriker, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: false, isOut: false, out: undefined };
             const bw: Bowler = { id: `bw-${Date.now()}`, name: bowler, overs: 0, ballsBowled: 0, runsConceded: 0, wickets: 0, maidens: 0, wides: 0, noBalls: 0 };
 
             return {
@@ -256,8 +257,8 @@ function matchReducer(state: MatchState, action: Action): MatchState {
 
             // Update State
             const finalWicketType = action.payload.wicketType;
-            let newWickets = state.wickets + (finalWicketType !== 'None' ? 1 : 0);
-            let newTotalRuns = state.totalRuns + totalRunsForBall;
+            const newWickets = state.wickets + (finalWicketType !== 'None' ? 1 : 0);
+            const newTotalRuns = state.totalRuns + totalRunsForBall;
             let newBallsInOver = state.ballsInCurrentOver + ballCounted;
             let newOvers = state.overs;
             let isOverComplete = false;
@@ -284,7 +285,7 @@ function matchReducer(state: MatchState, action: Action): MatchState {
             }
 
             // Handle Wicket marking for batsman
-            let newFow = [...state.fow];
+            const newFow = [...state.fow];
             if (finalWicketType !== 'None') {
                 // For Run Out, usually the one who gets out can be either striker or non-striker.
                 // For simplicity, we assume the ball was faced by striker, but we should mark which one got out.
@@ -389,7 +390,7 @@ function matchReducer(state: MatchState, action: Action): MatchState {
             }
         }
         case 'SELECT_NEXT_BATSMAN': {
-            const newBatsman: Batsman = { id: `b-${Date.now()}`, name: action.payload.name, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: true, isOut: false };
+            const newBatsman: Batsman = { id: `b-${Date.now()}`, name: action.payload.name, runs: 0, ballsFaced: 0, fours: 0, sixes: 0, isStriker: true, isOut: false, out: undefined };
             // The existing batsman (who was non-striker) stays, new batsman becomes striker
             const updatedBatsmen = state.currentBatsmen.map(b => ({ ...b, isStriker: false }));
             updatedBatsmen.push(newBatsman);
