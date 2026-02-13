@@ -97,7 +97,11 @@ function calculateManOfTheMatch(batsmen: Batsman[], bowlers: Bowler[]): { id: st
         }
     }
 
-    return bestPlayer ? { id: bestPlayer.id, name: bestPlayer.name, reason } : { id: '0', name: 'N/A', reason: 'N/A' };
+    if (!bestPlayer) {
+        return { id: '0', name: 'N/A', reason: 'N/A' };
+    }
+
+    return { id: bestPlayer.id, name: bestPlayer.name, reason };
 }
 
 function matchReducer(state: MatchState, action: Action): MatchState {
